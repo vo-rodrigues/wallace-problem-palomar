@@ -1,0 +1,108 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  metadata:
+    name: Validate submission metadata and layout
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: ruby/setup-ruby@95ef2b042f9d7a56d8268cba8559e2842e2ad01b
+        with:
+          ruby-version: "3.3.12"
+      - name: Validate formalization metadata
+        run: ruby scripts/validate-formalization.rb
+      - name: Validate conventional Palomar files
+        run: |
+          python3 - <<'PY'
+          import json
+          import pathlib
+          import re
+
+          root = pathlib.Path(".")
+          required = {
+              "lean-toolchain", "lakefile.toml", "lake-manifest.json",
+              "formalization.yaml", "Challenge.lean", "Solution.lean",
+              "comparator.json", "LICENSE",
+          }
+          missing = sorted(name for name in required if not (root / name).is_file())
+          if missing:
+              raise SystemExit(f"missing required files: {', '.join(missing)}")
+
+          if (root / "lakefile.lean").exists():
+              raise SystemExit("exactly one Lakefile is allowed")
+
+          toolchain = (root / "lean-toolchain").read_text().strip()
+          if not re.fullmatch(r"leanprover/lean4:v\d+\.\d+\.\d+(?:-rc\d+)?", toolchain):
+              raise SystemExit(f"unsupported lean-toolchain spelling: {toolchain}")
+
+          challenge = root / "Challenge.lean"
+          data = challenge.read_bytes()
+          lines = data.count(b"\n") + (not data.endswith(b"\n"))
+          if len(data) > 100 * 1024 or lines > 1000:
+              raise SystemExit("Challenge.lean exceeds Palomar's hard size limit")
+
+          config = json.loads((root / "comparator.json").read_text())
+          allowed_keys = {
+              "challenge_module", "solution_module", "theorem_names",
+              "definition_names", "permitted_axioms", "enable_nanoda",
+          }
+          if set(config) - allowed_keys:
+              raise SystemExit(f"unexpected comparator keys: {set(config) - allowed_keys}")
+          if not config.get("theorem_names"):
+              raise SystemExit("comparator theorem_names must be nonempty")
+          if set(config.get("permitted_axioms", [])) - {
+              "propext", "Quot.sound", "Classical.choice"
+          }:
+              raise SystemExit("comparator contains an unpermitted axiom")
+          if config.get("enable_nanoda") is not True:
+              raise SystemExit("NanoDa must be enabled in the local check")
+
+          licence = (root / "LICENSE").read_text(encoding="utf-8")
+          if "Apache License" not in licence or "Version 2.0" not in licence:
+              raise SystemExit("LICENSE is not the expected Apache-2.0 text")
+          PY
+
+  build:
+    name: Build Challenge and Solution
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: leanprover/lean-action@38fbc41a8c28c4cbaec22d7f7de508ec2e7c0dd9
+        with:
+          build: true
+
+  comparator:
+    name: Compare statements and replay proofs
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: leanprover/lean-action@38fbc41a8c28c4cbaec22d7f7de508ec2e7c0dd9
+        with:
+          build: false
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e
+        with:
+          go-version: "1.24.0"
+          cache: false
+      - name: Run the pinned Comparator toolchain
+        run: bash scripts/verify-comparator.sh

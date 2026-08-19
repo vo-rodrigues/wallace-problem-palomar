@@ -1,0 +1,13 @@
+/.cache/
+/.lake/
+/.tmp/
+*.olean
+*.ilean
+*.trace
+*.a
+*.bc
+*.dll
+*.dylib
+*.o
+*.obj
+*.so

@@ -1,0 +1,139 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/mathlib-initiative/formalization.yaml/main/schema/formalization.schema.json
+# Palomar metadata for the Comparator wrapper around the Wallace formalization.
+version: "v0.4"
+
+project:
+  name: "The Wallace problem and countably compact torsion-free Abelian groups in ZFC — Lean 4 formalization"
+  description: >-
+    Lean 4 formalization of the theorem that every torsion-free Abelian group
+    of cardinality continuum admits a Hausdorff countably compact group
+    topology in which every convergent sequence is eventually constant, and
+    constructs a commutative Tychonoff countably compact cancellative
+    topological monoid that is not a group, giving a negative answer to
+    Wallace's question.
+  authors:
+    - "Juliane Trianon Fraga"
+    - "Vinicius de Oliveira Rodrigues"
+  responsible_maintainers:
+    - "Juliane Trianon Fraga"
+    - "Vinicius de Oliveira Rodrigues"
+  license: "Apache-2.0"
+
+repository:
+  role: "thin-wrapper"
+  substantive_formalization:
+    id: "vo-rodrigues/wallace-problem-zfc-paper"
+    revision: "8bfced3125a685e868eaa3ece5ae6e5f16c8c59e"
+    note: >-
+      The substantive proof is the self-contained Lean project in the lean/
+      subdirectory at this immutable commit. This repository is a thin
+      Comparator wrapper containing the Mathlib-only Challenge statements and
+      their bridges to the proof library.
+
+classification:
+  arxiv: ["math.GR", "math.GN"]
+  msc2020: ["22A05", "54H11", "54D20", "22A15", "20K20", "54A20"]
+
+sources:
+  - title: "The Wallace problem and countably compact torsion-free Abelian groups in ZFC"
+    authors:
+      - "Juliane Trianon Fraga"
+      - "Vinicius de Oliveira Rodrigues"
+    id: "arXiv:2608.17317v1"
+    type: "paper"
+    location: "https://arxiv.org/abs/2608.17317v1"
+    relationship: "formalizes"
+    note: >-
+      The Lean development formalizes the paper's construction. This Palomar
+      entry selects its universal group-topology theorem and the resulting
+      negative answer to Wallace's question. The paper authors directed the
+      formalization and are also the formalization authors.
+    license: "CC-BY-4.0"
+    author_endorsement: "participated"
+
+status:
+  scope: >-
+    This submission compares exactly the universal theorem for torsion-free
+    Abelian groups of cardinality continuum and the commutative Tychonoff
+    Wallace counterexample. No other result from the substantive development
+    or cited paper is selected by this Comparator entry.
+  sorry_count: 0
+  sorry_in_definitions: 0
+  axioms: ["propext", "Classical.choice", "Quot.sound"]
+
+automation:
+  methods:
+    - method: "agent"
+      models: ["gpt-5.6-sol"]
+      framework: "OpenAI Codex"
+      tool_setup: >-
+        OpenAI Codex generated the entire Lean development in an iterative
+        agent-driven workflow and later adapted it into this Palomar
+        Challenge/Solution wrapper. The workflow used local Lean builds,
+        NanoDa, statement checks, searches for sorry declarations, transitive
+        axiom audits, and verification scripts prepared by Codex.
+      cost:
+        wall_time: "approximately 4-6 hours"
+        spend_usd: "$0 out of pocket; subscription-based usage"
+        hardware: >-
+          OpenAI-hosted model with local Lean verification on Windows 11
+          Education (64-bit), an Intel Core i5-12600K, 32 GiB of RAM, and an
+          NVIDIA GeForce RTX 4060 Ti GPU
+      prompting_notes: >-
+        The authors worked together to supply the mathematical objectives,
+        context, constraints, ideas, and feedback. They iteratively steered the
+        agent, examined its results, and selected the released artifact. Codex
+        generated all of the Lean code.
+  spend_usd: >-
+    $0 out of pocket; access used a complimentary subscription normally priced
+    at USD 200 per month
+  notes: >-
+    The formalization was produced entirely by OpenAI Codex using GPT-5.6-sol
+    in a process jointly directed by both authors. The subscription was
+    provided at no charge by OpenAI. The authors made no API calls, so there
+    was no task-specific API spend. Token counts were not retained. The
+    authors reviewed and take responsibility for the released artifact.
+
+fidelity:
+  divergences: >-
+    No divergence is known between the two compared claims and their
+    corresponding statements in the cited paper.
+
+review:
+  status: "self-assessed"
+  reviewers:
+    - "Juliane Trianon Fraga"
+    - "Vinicius de Oliveira Rodrigues"
+    - "OpenAI Codex (GPT-5.6-sol)"
+  notes: >-
+    Both authors read the compared statements, searched the development for
+    sorry declarations and additional axioms, and performed a high-level review
+    of the remaining Lean code. They also ran NanoDa and the verification and
+    audit scripts prepared by Codex. OpenAI Codex, using GPT-5.6-sol, assisted
+    with statement matching, Lean compilation, dependency inspection, and
+    transitive axiom audits. No independent human peer review of the Lean code
+    is claimed.
+
+alignment:
+  namespace: "Wallace.Palomar"
+  statements:
+    - source: "Introduction, thm:main"
+      lean: "Wallace.Palomar.torsionFreeAbelianGroup_mainTheorem"
+      module: "Challenge"
+      status: "proved"
+      note: >-
+        States the exact universal paper-level conclusion for every
+        torsion-free Abelian group of cardinality continuum. Solution.lean
+        bridges it to Wallace.torsionFreeAbelianGroup_mainTheorem_exact.
+    - source: "Introduction, cor:wallace"
+      lean: "Wallace.Palomar.commutativeTychonoffWallaceCounterexampleExists"
+      module: "Challenge"
+      status: "proved"
+      note: >-
+        Exposes commutativity, continuous addition, two-sided cancellation,
+        Hausdorffness, Tychonoff separation, countable compactness, and a
+        noninvertible element directly in the compared proposition.
+
+acknowledgements: >-
+  The second author was supported by the São Paulo Research Foundation
+  (FAPESP), grant no. 2025/07302-0.
