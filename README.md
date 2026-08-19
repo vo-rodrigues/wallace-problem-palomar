@@ -10,7 +10,7 @@ formalization accompanying:
 The substantive proof lives in the public
 [`wallace-problem-zfc-paper`](https://github.com/vo-rodrigues/wallace-problem-zfc-paper)
 repository. This wrapper fixes it at commit
-[`8bfced3125a685e868eaa3ece5ae6e5f16c8c59e`](https://github.com/vo-rodrigues/wallace-problem-zfc-paper/commit/8bfced3125a685e868eaa3ece5ae6e5f16c8c59e)
+[`23756864de1f14e272dafb070b97fcdc7cbc75c5`](https://github.com/vo-rodrigues/wallace-problem-zfc-paper/commit/23756864de1f14e272dafb070b97fcdc7cbc75c5)
 and exposes two Mathlib-only statements to
 [`leanprover/comparator`](https://github.com/leanprover/comparator).
 

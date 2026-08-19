@@ -23,12 +23,12 @@ repository:
   role: "thin-wrapper"
   substantive_formalization:
     id: "vo-rodrigues/wallace-problem-zfc-paper"
-    revision: "8bfced3125a685e868eaa3ece5ae6e5f16c8c59e"
+    revision: "23756864de1f14e272dafb070b97fcdc7cbc75c5"
     note: >-
-      The substantive proof is the self-contained Lean project in the lean/
-      subdirectory at this immutable commit. This repository is a thin
-      Comparator wrapper containing the Mathlib-only Challenge statements and
-      their bridges to the proof library.
+      The substantive proof is the Lean library under lean/, exposed as a
+      root Lake package at this immutable commit. This repository is a thin
+      Comparator wrapper containing the Mathlib-only Challenge statements
+      and their bridges to the proof library.
 
 classification:
   arxiv: ["math.GR", "math.GN"]
